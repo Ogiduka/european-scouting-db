@@ -15,7 +15,7 @@ jobs:
 
       - name: Set up Python
         uses: actions/setup-python@v5
-        with:
+        uh
           python-version: '3.11'
 
       - name: Install dependencies
@@ -23,4 +23,9 @@ jobs:
 
       - name: Check FEB importer
         run: python -m py_compile feb_importer.py
+      - name: Test FEB data download
+        run: |
+          python feb_importer.py --league tercera-feb --output feb_test.csv
+          test -s feb_test.csv
+          echo "FEB CSV successfully generated"
 
