@@ -1,0 +1,37 @@
+name: NBA Statistics Import
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  nba-import:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r world-requirements.txt
+
+      - name: Download NBA statistics
+        run: |
+          python importers/world_import.py --source nba --mode export --season 2025-26 --output nba_stats.csv
+          test -s nba_stats.csv
+
+      - name: Save NBA CSV
+        uses: actions/upload-artifact@v4
+        with:
+          name: nba-statistics
+          path: nba_stats.csv
+          if-no-files-found: error
+          retention-days: 30
