@@ -1,0 +1,48 @@
+name: RealGM Public Stats Pilot
+
+on:
+  workflow_dispatch:
+    inputs:
+      league:
+        description: "League"
+        required: true
+        default: "acb"
+        type: choice
+        options:
+          - acb
+          - nbl
+      season:
+        description: "Season ending year"
+        required: true
+        default: "2027"
+
+permissions:
+  contents: read
+
+jobs:
+  realgm-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests beautifulsoup4 pandas lxml
+
+      - name: Download RealGM stats
+        run: |
+          python importers/realgm_importer.py --league "${{ inputs.league }}" --season "${{ inputs.season }}" --output realgm_stats.csv
+          test -s realgm_stats.csv
+
+      - name: Save CSV
+        uses: actions/upload-artifact@v4
+        with:
+          name: realgm-stats
+          path: realgm_stats.csv
+          if-no-files-found: error
