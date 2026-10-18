@@ -28,4 +28,11 @@ jobs:
           python feb_importer.py --league tercera-feb --output feb_test.csv
           test -s feb_test.csv
           echo "FEB CSV successfully generated"
+      - name: Save FEB CSV
+        uses: actions/upload-artifact@v4
+        with:
+          name: feb-tercera-statistics
+          path: feb_test.csv
+          if-no-files-found: error
+          retention-days: 30
 
